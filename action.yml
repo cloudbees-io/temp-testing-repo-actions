@@ -1,0 +1,53 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: action
+name: jenkins build actions
+inputs:
+  integration-name:
+    description: 'integration name'
+    required: false
+    default: ''
+  url:  # id of input
+    description: 'jenkins url'
+    required: false
+  username:  # id of input
+    description: 'user name'
+    required: false
+  token:  # id of input
+    description: 'token'
+    required: false
+  job-name:  # id of input
+    description: 'job name'
+    required: true
+  test-type:  # id of input
+    description: 'test type'
+    default: ''
+  test-result-location:  # id of input
+    description: 'test result location'
+    default: ''
+  parameters:  # id of input
+    description: 'parameters as json'
+    default: '{}'
+
+outputs:
+  jenkins_output:
+    value: ${{ steps.invoke-jenkins-job.outputs.jenkins_output_var }}
+    description: Jenkins variable output
+    
+runs:
+  using: composite
+  steps:
+    - id: invoke-jenkins-job
+      name: invoke-jenkins-job
+      uses: docker://public.ecr.aws/l7o7z1g8/actions/temp-testing-repo:main-b5bfd588e2a017e377a7108585caef75df1e60d3
+      shell: sh
+      env:
+        CONFIG_JSON: '{"metaInfo":{"integrationName":"${{ inputs.integration-name }}","url":"${{ inputs.url }}","toolType":"JENKINS","username":"${{ inputs.username }}","token":"${{ inputs.token }}","jobName":"${{ inputs.job-name }}","testType":"${{ inputs.test-type }}","fileName":"${{ inputs.test-result-location }}","parameters":${{ inputs.parameters }},"commitId":"${{ cloudbees.scm.sha }}"}}'
+        RUN_ID: ${{ cloudbees.run_id }}
+        JOB_ID: ${{ job.id }}
+        STEP_ID: ${{step.internal.id}}
+        DNS_URL: ${{ cloudbees.api.url }}
+        JWT_TOKEN: ${{ cloudbees.api.token }}
+      run: |
+        set -x
+        cd /app
+        ./jenkins_actions_app invoke -b $CONFIG_JSON
