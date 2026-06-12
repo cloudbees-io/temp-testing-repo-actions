@@ -38,7 +38,7 @@ runs:
   steps:
     - id: invoke-jenkins-job
       name: invoke-jenkins-job
-      uses: docker://public.ecr.aws/l7o7z1g8/actions/temp-testing-repo:main-a38f8b3d8933c752b41206ac65f86cee7bbe2d2u
+      uses: docker://public.ecr.aws/l7o7z1g8/actions/temp-testing-repo:main-a38f8b3d8933c752b41206ac65f86cee7bbe2d2v
       shell: sh
       env:
         CONFIG_JSON: '{"metaInfo":{"integrationName":"${{ inputs.integration-name }}","url":"${{ inputs.url }}","toolType":"JENKINS","username":"${{ inputs.username }}","token":"${{ inputs.token }}","jobName":"${{ inputs.job-name }}","testType":"${{ inputs.test-type }}","fileName":"${{ inputs.test-result-location }}","parameters":${{ inputs.parameters }},"commitId":"${{ cloudbees.scm.sha }}"}}'
